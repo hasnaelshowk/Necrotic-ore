@@ -1,0 +1,124 @@
+<CompuCell3D Revision="20171121" Version="3.7.7">
+   
+   <Potts>
+      
+      <!-- Basic properties of CPM (GGH) algorithm -->
+      <Dimensions x="500" y="500" z="1"/>
+      <Steps>1000000</Steps>
+      <Temperature>50</Temperature>
+      <RandomSeed>2284322</RandomSeed>
+      <NeighborOrder>3</NeighborOrder>
+      <Boundary_x>Periodic</Boundary_x>
+      <Boundary_y>Periodic</Boundary_y>
+   </Potts>
+   
+   <Plugin Name="CellType">
+      
+      <!-- Listing all cell types in the simulation -->
+      <CellType TypeId="0" TypeName="Medium"/>
+      <CellType TypeId="1" TypeName="PCancer"/>
+      <CellType TypeId="2" TypeName="QCancer"/>
+      <CellType TypeId="3" TypeName="Necrotic"/>
+      <CellType TypeId="4" TypeName="PStem"/>
+      <CellType TypeId="5" TypeName="QStem"/>
+   </Plugin>
+   
+   <Plugin Name="Volume"/>
+   
+   <Plugin Name="Surface"/>
+   
+   <Plugin Name="CenterOfMass">
+      
+      <!-- Module tracking center of mass of each cell -->
+   </Plugin>
+   
+   <Plugin Name="PixelTracker">
+      
+      <!-- Module tracking pixels of each cell -->
+   </Plugin>
+
+                  
+   <Plugin Name="AdhesionFlex">
+      
+      <!-- Specification of adhesion energies as a function of cadherin concentration at cell membranes -->
+      <!-- Adhesion energy is a function of two cells in ocntact. the functional form is specified by the user -->
+      <AdhesionMolecule Molecule="Cad"/>
+      <AdhesionMolecule Molecule="Int"/>
+      <AdhesionMolecule Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="PCancer" Density="8.0" Molecule="Cad"/>
+      <AdhesionMoleculeDensity CellType="PCancer" Density="8.0" Molecule="Int"/>
+      <AdhesionMoleculeDensity CellType="PCancer" Density="0" Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="QCancer" Density="8.0" Molecule="Cad"/>
+      <AdhesionMoleculeDensity CellType="QCancer" Density="8.0" Molecule="Int"/>
+      <AdhesionMoleculeDensity CellType="QCancer" Density="0" Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="Necrotic" Density="8.0" Molecule="Cad"/>
+      <AdhesionMoleculeDensity CellType="Necrotic" Density="8.0" Molecule="Int"/>
+      <AdhesionMoleculeDensity CellType="Necrotic" Density="0" Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="Medium" Density="16.0" Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="PStem" Density="8.0" Molecule="Cad"/>
+      <AdhesionMoleculeDensity CellType="PStem" Density="8.0" Molecule="Int"/>
+      <AdhesionMoleculeDensity CellType="PStem" Density="0" Molecule="FN"/>
+      <AdhesionMoleculeDensity CellType="QStem" Density="8.0" Molecule="Cad"/>
+      <AdhesionMoleculeDensity CellType="QStem" Density="8.0" Molecule="Int"/>
+      <AdhesionMoleculeDensity CellType="QStem" Density="0" Molecule="FN"/>
+      <BindingFormula Name="Binary">
+         <Formula>min(Molecule1,Molecule2)</Formula>
+         <Variables>
+            <AdhesionInteractionMatrix>
+               <BindingParameter Molecule1="Cad" Molecule2="Cad">2.0</BindingParameter>
+               <BindingParameter Molecule1="Int" Molecule2="FN">0.2</BindingParameter>
+               
+            </AdhesionInteractionMatrix>
+         </Variables>
+      </BindingFormula>
+      <NeighborOrder>3</NeighborOrder>
+   </Plugin>
+   
+   
+   
+   <Steppable Type="SteadyStateDiffusionSolver2D">
+      
+      <!-- Specification of PDE solvers -->
+      <DiffusionField Name="Glucose">
+         <DiffusionData>
+            <FieldName>Glucose</FieldName>
+            <DiffusionConstant>13500.0</DiffusionConstant>
+            <DecayConstant>0.45</DecayConstant>
+            
+         </DiffusionData>
+         <SecretionData>
+           <Uptake Type="QStem" MaxUptake="1.69" MichaelisMentenCoef="0.00256"/>
+           <Uptake Type="PStem" MaxUptake="2.25" MichaelisMentenCoef="0.00256"/>
+           <Uptake Type="QCancer" MaxUptake="1.69" MichaelisMentenCoef="0.00256"/>
+           <Uptake Type="PCancer" MaxUptake="2.25" MichaelisMentenCoef="0.00256"/>
+           <Secretion Type="Medium">0.145</Secretion>
+         </SecretionData>
+         
+         <BoundaryConditions>
+                 <Plane Axis="X">
+                    <Periodic/> 
+                 </Plane>
+                 <Plane Axis="Y">
+                    <Periodic/> 
+                 </Plane>
+         </BoundaryConditions>
+      </DiffusionField>
+      
+   </Steppable>
+   
+   
+   <Steppable Type="BlobInitializer">
+   
+            
+     <Region>
+        <Center x="250" y="250" z="0"/>
+        <Radius>8</Radius>
+        <Gap>0</Gap>
+        <Width>4</Width>
+        <Types>PCancer,QCancer,PStem,QStem</Types>
+     </Region>
+</Steppable>
+        
+        
+
+</CompuCell3D>
